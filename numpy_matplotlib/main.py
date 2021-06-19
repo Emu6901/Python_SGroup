@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 img = cv2.imread('image.png')
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 plt.subplot(1, 3, 1)
 plt.imshow(img)
 
