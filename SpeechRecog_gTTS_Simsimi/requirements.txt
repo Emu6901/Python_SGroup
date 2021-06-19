@@ -1,0 +1,6 @@
+PyQt5~=5.15.4
+PyAudio~=0.2.11
+requests~=2.25.1
+gTTS~=2.2.2
+pip~=21.1.2
+playsound~=1.2.2
