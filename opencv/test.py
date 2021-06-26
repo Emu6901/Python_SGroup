@@ -1,38 +1,64 @@
-import os
-
 import cv2
-import imutils as imutils
+import imutils
 import numpy as np
-import pytesseract
-from PIL import ImageFilter, Image
-from PIL.ImageEnhance import Color
 
-# crop_img = cv2.imread('img.jpg', cv2.IMREAD_COLOR)
-# crop_img = cv2.imread('Cars14.png', cv2.IMREAD_COLOR)
-# crop_img = cv2.imread('Cars0.png', cv2.IMREAD_COLOR)
-crop_img = cv2.imread('img1.jpg', cv2.IMREAD_COLOR)
-crop_img = cv2.resize(crop_img, (620, 400))
-crop_gray = cv2.cvtColor(crop_img.copy(), cv2.COLOR_BGR2GRAY)
-crop_gray = cv2.bilateralFilter(crop_gray, 13, 15, 15)
-crop_edged = edged = cv2.Canny(crop_gray, 30, 200)
-cv2.imshow("crop_edged", crop_edged)
-crop_contours = cv2.findContours(crop_edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-crop_contours = imutils.grab_contours(crop_contours)
-crop_contours = sorted(crop_contours, key=cv2.contourArea, reverse=True)[:10]
+# Param
+max_size = 5000
+min_size = 900
 
-image = crop_img.copy()
-image = cv2.resize(image, (600, 400))
-for cnt in crop_contours:
-    area = cv2.contourArea(cnt)
-    epsilon = 0.05 * cv2.arcLength(cnt, True)
-    approx = cv2.approxPolyDP(cnt, epsilon, True)
-    print(area)
-    if len(approx) == 4 and cv2.contourArea(cnt)>200:
-        x, y, w, h = cv2.boundingRect(cnt)
-        ROI = 255 - crop_edged[y:y + h, x:x + w]
-        cv2.drawContours(image, [cnt], -1, (0, 255, 0), -1)
-        # cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
-        cv2.imshow("image", image)
-        cv2.waitKey(1000)== ord('q')
+# Load image
+img = cv2.imread('img1.jpg', cv2.IMREAD_COLOR)
 
-cv2.waitKey(0) == ord('q')
+# Resize image
+img = cv2.resize(img, (620, 480))
+
+# Edge detection
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert to grey scale
+gray = cv2.bilateralFilter(gray, 11, 17, 17)  # Blur to reduce noise
+edged = cv2.Canny(gray, 30, 200)  # Perform Edge detection
+
+# find contours in the edged image, keep only the largest
+# ones, and initialize our screen contour
+cnts = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+cnts = imutils.grab_contours(cnts)
+cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+screenCnt = None
+
+# loop over our contours
+for c in cnts:
+    # approximate the contour
+    peri = cv2.arcLength(c, True)
+    approx = cv2.approxPolyDP(c, 0.05 * peri, True)
+
+    # if our approximated contour has four points, then
+    # we can assume that we have found our screen
+    if len(approx) == 4 and max_size > cv2.contourArea(c) > min_size:
+        screenCnt = approx
+        break
+
+if screenCnt is None:
+    detected = 0
+    print ("No plate detected")
+else:
+    detected = 1
+
+if detected == 1:
+    cv2.drawContours(img, [screenCnt], -1, (0, 255, 0), 3)
+
+    # Masking the part other than the number plate
+    mask = np.zeros(gray.shape, np.uint8)
+    new_image = cv2.drawContours(mask, [screenCnt], 0, 255, -1, )
+    new_image = cv2.bitwise_and(img, img, mask=mask)
+
+    # Now crop
+    (x, y) = np.where(mask == 255)
+    (topx, topy) = (np.min(x), np.min(y))
+    (bottomx, bottomy) = (np.max(x), np.max(y))
+    Cropped = gray[topx:bottomx + 1, topy:bottomy + 1]
+
+    # Display image
+    cv2.imshow('Input image', img)
+    cv2.imshow('License plate', Cropped)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
