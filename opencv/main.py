@@ -21,7 +21,7 @@ def recog():
     crop_gray = cv2.bilateralFilter(crop_gray, 13, 15, 15)
     crop_blur = cv2.GaussianBlur(crop_gray, (5, 5), 1)
     crop_edged = cv2.threshold(crop_gray, 0, 80, cv2.THRESH_OTSU)[1]
-    cv2.imshow("cropped", crop_edged)
+    cv2.imshow("cropped1", crop_edged)
 
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
     text = pytesseract.image_to_string(crop_edged, config='--oem 3 --psm 6')  # converts image characters to string
@@ -33,8 +33,8 @@ def recog():
     return ans
 
 
-img = cv2.imread('img.jpg', cv2.IMREAD_COLOR)
-# img = cv2.imread('img1.jpg', cv2.IMREAD_COLOR)
+# img = cv2.imread('img.jpg', cv2.IMREAD_COLOR)
+img = cv2.imread('img1.jpg', cv2.IMREAD_COLOR)
 # img = cv2.imread('Cars0.png', cv2.IMREAD_COLOR)
 # img = cv2.imread('Cars14.png', cv2.IMREAD_COLOR)
 # img = cv2.imread('Cars27.png', cv2.IMREAD_COLOR)
