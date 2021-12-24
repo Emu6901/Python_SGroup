@@ -1,10 +1,10 @@
-# Creating a TF-IDF Model from Scratch in Python
+# Creating a TF-IDF Method from Scratch in Python
 
-- The TF-IDF model is a method to represent words in numerical values. “Hello there, how have you been?”, you can easily understand what I am trying to ask you but computers are good with numbers and not with words.
+- “Hello there, how have you been?”, you can easily understand what I am trying to ask you but computers are good with numbers and not with words.
 
 - In order for a computer to make sense of the sentences and words, we represent these sentences using numbers while hoping to preserve the context and meaning.
 
-- TF-IDF model is one such method to represent words in numerical values. TF-IDF stands for “Term Frequency – Inverse Document Frequency”.
+- TF-IDF Method is one such method to represent words in numerical values. TF-IDF stands for “Term Frequency – Inverse Document Frequency”.
 
 ## TF-IDF = Term Frequency (TF) * Inverse Document Frequency (IDF)
 #### where:
